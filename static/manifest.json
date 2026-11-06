@@ -1,0 +1,15 @@
+{
+  "name": "Asistente Técnico Defensivo",
+  "short_name": "AsistenteIA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#38bdf8",
+  "icons": [
+    {
+      "src": "[https://via.placeholder.com/192](https://via.placeholder.com/192)",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
