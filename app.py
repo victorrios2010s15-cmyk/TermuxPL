@@ -32,7 +32,7 @@ def consultar():
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.8-flash',
             contents=f"{SYSTEM_PROMPT}\n\nPregunta del usuario: {pregunta}"
         )
         return jsonify({'respuesta': response.text})
