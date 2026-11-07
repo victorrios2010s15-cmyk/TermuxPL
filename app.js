@@ -19,7 +19,7 @@ const livePreview = document.getElementById('live-preview');
 const fileSelect = document.getElementById('file-select');
 
 const files = {
-    'index.html': '<h1>¡Hola Mundo!</h1>\n<p>Edita este código y mira el resultado en tiempo real.</p>',
+    'index.html': '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Document</title></head><body><h1>Hola mundo</h1></body></html>\n<p>Edita este código y mira el resultado en tiempo real.</p>',
     'style.css': 'body { font-family: sans-serif; text-align: center; margin-top: 50px; background: #f0f0f0; }',
     'app.js': 'console.log("DevSuite Activo");'
 };

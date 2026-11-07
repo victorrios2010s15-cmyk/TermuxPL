@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devsuite-v3';
+const CACHE_NAME = 'devsuite-v4';
 const ASSETS = [
   './index.html',
   './style.css',
