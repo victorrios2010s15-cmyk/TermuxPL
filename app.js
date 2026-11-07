@@ -24,7 +24,6 @@ const files = {
     'app.js': 'console.log("DevSuite Activo");'
 };
 
-// Cargar archivo seleccionado
 fileSelect.addEventListener('change', (e) => {
     codeTextarea.value = files[e.target.value];
 });
@@ -284,13 +283,11 @@ window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
 
-// --- GESTOR MULTIPROYECTO (Bóveda de Proyectos con Títulos) ---
+// --- GESTOR MULTIPROYECTO ---
 const projectTitleInput = document.getElementById('project-title-input');
 const saveProjectVaultBtn = document.getElementById('save-project-vault-btn');
 const projectsList = document.getElementById('projects-list');
 
-
-// Guardar proyecto con título personalizado desde su sección
 if (saveProjectVaultBtn) {
     saveProjectVaultBtn.addEventListener('click', () => {
         const title = projectTitleInput.value.trim();
@@ -315,7 +312,6 @@ if (saveProjectVaultBtn) {
     });
 }
 
-// Cargar la lista de proyectos en pantalla y corregir salto automático a pestaña
 function loadProjectsList() {
     if (!projectsList) return;
     projectsList.innerHTML = '';
@@ -339,17 +335,14 @@ function loadProjectsList() {
             </div>
         `;
 
-        // Botón para cargar el proyecto, actualizar editores Y saltar automáticamente a la pestaña del editor
         card.querySelector('.load-proj-btn').addEventListener('click', () => {
             files['index.html'] = savedFiles['index.html'] || files['index.html'];
             files['style.css'] = savedFiles['style.css'] || files['style.css'];
             files['app.js'] = savedFiles['app.js'] || files['app.js'];
 
-            // Refrescar el textarea con el archivo seleccionado en el selector
             codeTextarea.value = files[fileSelect.value];
             updatePreview();
 
-            // SALTO AUTOMÁTICO: Cambia a la pestaña de "Editor de Código" visualmente
             navBtns.forEach(b => b.classList.remove('active'));
             tabSections.forEach(s => s.classList.remove('active'));
             
@@ -361,7 +354,6 @@ function loadProjectsList() {
             alert(`¡Proyecto "${title}" cargado correctamente en el editor!`);
         });
 
-        // Botón para eliminar proyecto
         card.querySelector('.delete-proj-btn').addEventListener('click', () => {
             if (confirm(`¿Seguro que deseas eliminar el proyecto "${title}"?`)) {
                 delete allProjects[title];
@@ -376,102 +368,6 @@ function loadProjectsList() {
 
 loadProjectsList();
 
-// --- RESPALDAR / EXPORTAR TODOS LOS PROYECTOS A JSON ---
-const exportAllBtn = document.getElementById('export-all-projects-btn');
-if (exportAllBtn) {
-    exportAllBtn.addEventListener('click', () => {
-        const allProjects = localStorage.getItem('devsuite_all_projects');
-        if (!allProjects || allProjects === '{}') {
-            alert('No hay proyectos guardados para exportar.');
-            return;
-        }
-        
-        const blob = new Blob([allProjects], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'devsuite_mis_proyectos.json';
-        a.click();
-        URL.revokeObjectURL(url);
-    });
-}
-
-// --- IMPORTAR PROYECTOS DESDE UN ARCHIVO JSON ---
-const importProjectsBtn = document.getElementById('import-projects-btn');
-const importProjectsFile = document.getElementById('import-projects-file');
-
-if (importProjectsBtn && importProjectsFile) {
-    importProjectsBtn.addEventListener('click', () => {
-        importProjectsFile.click();
-    });
-
-    importProjectsFile.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const importedData = JSON.parse(event.target.result);
-                let currentProjects = JSON.parse(localStorage.getItem('devsuite_all_projects') || '{}');
-                
-                currentProjects = { ...currentProjects, ...importedData };
-                
-                localStorage.setItem('devsuite_all_projects', JSON.stringify(currentProjects));
-                loadProjectsList();
-                alert('¡Proyectos importados con éxito y añadidos a tu bóveda!');
-            } catch (err) {
-                alert('Error al leer el archivo. Asegúrate de que sea un JSON válido de DevSuite.');
-            }
-        };
-        reader.readAsText(file);
-        importProjectsFile.value = '';
-    });
-}
-
-// --- CARGAR ARCHIVO INDIVIDUAL (.html, .css, .js) ---
-const importSingleBtn = document.getElementById('import-single-btn');
-const importSingleFile = document.getElementById('import-single-file');
-
-if (importSingleBtn && importSingleFile) {
-    importSingleBtn.addEventListener('click', () => {
-        importSingleFile.click();
-    });
-
-    importSingleFile.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const fileName = file.name;
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-            const content = event.target.result;
-
-            if (fileName.endsWith('.html')) {
-                files['index.html'] = content;
-                fileSelect.value = 'index.html';
-            } else if (fileName.endsWith('.css')) {
-                files['style.css'] = content;
-                fileSelect.value = 'style.css';
-            } else if (fileName.endsWith('.js')) {
-                files['app.js'] = content;
-                fileSelect.value = 'app.js';
-            } else {
-                alert('Formato no soportado. Selecciona un archivo .html, .css o .js');
-                return;
-            }
-
-            codeTextarea.value = content;
-            updatePreview();
-            alert(`¡Archivo "${fileName}" cargado en el editor!`);
-        };
-
-        reader.readAsText(file);
-        importSingleFile.value = '';
-    });
-}
-
 // --- LABORATORIO PYTHON COMPLETO ---
 const pythonInput = document.getElementById('python-input');
 const pythonOutput = document.getElementById('python-output');
@@ -482,7 +378,6 @@ const savePythonBtn = document.getElementById('save-python-btn');
 const importPythonBtn = document.getElementById('import-python-btn');
 const importPythonFile = document.getElementById('import-python-file');
 
-// 1. Ejecutar código Python (simulador de print)
 if (runPythonBtn) {
     runPythonBtn.addEventListener('click', () => {
         const code = pythonInput.value.trim();
@@ -516,7 +411,6 @@ if (runPythonBtn) {
     });
 }
 
-// 2. Limpiar consola y editor
 if (clearPythonBtn) {
     clearPythonBtn.addEventListener('click', () => {
         pythonInput.value = '';
@@ -525,7 +419,6 @@ if (clearPythonBtn) {
     });
 }
 
-// 3. Copiar salida al portapapeles
 if (copyPythonBtn) {
     copyPythonBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(pythonOutput.textContent);
@@ -533,7 +426,6 @@ if (copyPythonBtn) {
     });
 }
 
-// 4. Guardar archivo script.py localmente
 if (savePythonBtn) {
     savePythonBtn.addEventListener('click', () => {
         const content = pythonInput.value;
@@ -549,7 +441,6 @@ if (savePythonBtn) {
     });
 }
 
-// 5. Cargar archivo externo en el editor de Python
 if (importPythonBtn && importPythonFile) {
     importPythonBtn.addEventListener('click', () => {
         importPythonFile.click();
@@ -568,43 +459,149 @@ if (importPythonBtn && importPythonFile) {
         importPythonFile.value = '';
     });
 }
-// --- TUTORIALES DE YOUTUBE (Precargados en el código + LocalStorage) ---
+
+// --- TUTORIALES PRECARGADOS ---
 const tutorialsList = document.getElementById('tutorials-list');
-
-// AQUÍ PUEDES AGREGAR TUS VIDEOS DIRECTAMENTE EN EL CÓDIGO
-// Cualquier persona que abra la app los verá automáticamente aquí:
 const defaultTutorials = [
-    { title: "Curso de HTML y CSS desde Cero", url: "https://www.youtube.com/watch?v=example1" },
-    { title: "JavaScript Moderno para Principiantes", url: "https://www.youtube.com/watch?v=example2" },
-    { title: "Crear una PWA paso a paso", url: "https://www.youtube.com/watch?v=example3" }
+    { title: "Curso Completo de HTML & CSS desde Cero", url: "https://www.youtube.com/watch?v=example1" },
+    { title: "JavaScript Moderno y Asíncrono para Principiantes", url: "https://www.youtube.com/watch?v=example2" },
+    { title: "Cómo Crear una Progressive Web App (PWA) Paso a Paso", url: "https://www.youtube.com/watch?v=example3" },
+    { title: "Aprende Python para Desarrolladores Web", url: "https://www.youtube.com/watch?v=example4" }
 ];
-
-// Combinamos los del código con los que el usuario guarde extra de forma local
-function getStoredTutorials() {
-    let customTutorials = JSON.parse(localStorage.getItem('devsuite_tutorials')) || [];
-    return [...defaultTutorials, ...customTutorials];
-}
 
 function renderTutorials() {
     if (!tutorialsList) return;
     tutorialsList.innerHTML = '';
-    
-    const allTutorials = getStoredTutorials();
-
-    if (allTutorials.length === 0) {
-        tutorialsList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No hay tutoriales disponibles.</p>';
-        return;
-    }
-
-    allTutorials.forEach((item, index) => {
+    defaultTutorials.forEach((item) => {
         const card = document.createElement('div');
         card.className = 'vault-card';
         card.innerHTML = `
             <h4 style="margin-bottom: 0.5rem; color: var(--accent);">${item.title}</h4>
-            <a href="${item.url}" target="_blank" style="color: #38bdf8; font-size: 0.85rem; word-break: break-all; display: block; margin-bottom: 0.75rem;">${item.url}</a>
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-size: 0.85rem; word-break: break-all; display: inline-block; margin-top: 0.25rem;">▶️ Ver en YouTube</a>
         `;
         tutorialsList.appendChild(card);
     });
 }
-
 renderTutorials();
+
+// --- SIMULADOR DE TERMINAL DE CIBERSEGURIDAD AVANZADO ---
+const terminalInput = document.getElementById('terminal-input');
+const terminalOutput = document.getElementById('terminal-output');
+
+if (terminalInput && terminalOutput) {
+    terminalInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const cmd = terminalInput.value.trim();
+            if (!cmd) return;
+
+            terminalOutput.innerHTML += `\nroot@devsuite:~# ${cmd}\n`;
+            let response = simulateAdvancedCommand(cmd);
+            terminalOutput.innerHTML += response;
+            
+            terminalInput.value = '';
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+    });
+}
+
+function simulateAdvancedCommand(command) {
+    const parts = command.trim().split(' ');
+    const lowerCmd = parts[0].toLowerCase();
+    const arg = parts[1] || '';
+
+    switch (lowerCmd) {
+        case 'help':
+            return `Comandos de red y hacking ético disponibles:
+ - ifconfig / ip a       : Muestra la configuración de red simulada.
+ - ping <ip/host>        : Simula envío de paquetes ICMP.
+ - nmap <ip>             : Escaneo de puertos y servicios abiertos.
+ - traceroute <ip>       : Rastrea la ruta de saltos de red hacia el objetivo.
+ - nslookup <dominio>    : Consulta registros DNS (IPs asociadas).
+ - whoami                : Muestra el usuario actual del sistema.
+ - dirbuster <url>       : Simula fuzzing de directorios web ocultos.
+ - hash <texto>          : Genera hashes simulados (MD5 / SHA256).
+ - base64 <texto>        : Codifica texto en formato Base64.
+ - clear                 : Limpia la pantalla de la terminal.\n`;
+
+        case 'clear':
+            terminalOutput.innerHTML = 'DevSuite CyberTerminal v2.5 (Secure Sandbox)';
+            return '';
+
+        case 'ifconfig':
+        case 'ip':
+            return `eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST> mtu 1500
+        inet 192.168.1.105  netmask 255.255.255.0  broadcast 192.168.1.255
+        inet6 fe80::42:acff:fe11:2342  prefixlen 64  scopeid 0x20<link>
+        ether 02:42:ac:11:23:42  txqueuelen 1000  (Ethernet)
+        RX packets 2450  bytes 312430 (305.1 KiB)
+        TX packets 1980  bytes 184400 (180.0 KiB)\n`;
+
+        case 'ping':
+            const pingTarget = arg || '127.0.0.1';
+            return `PING ${pingTarget} (${pingTarget}) 56(84) bytes of data.
+64 bytes from ${pingTarget}: icmp_seq=1 ttl=118 time=21.4 ms
+64 bytes from ${pingTarget}: icmp_seq=2 ttl=118 time=19.8 ms
+64 bytes from ${pingTarget}: icmp_seq=3 ttl=118 time=22.1 ms
+--- ${pingTarget} ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2002ms\n`;
+
+        case 'nmap':
+            const nmapTarget = arg || '192.168.1.50';
+            return `Starting Nmap 7.94 ( https://nmap.org ) 
+Nmap scan report for ${nmapTarget}
+Host is up (0.012s latency).
+Not shown: 996 closed ports
+PORT     STATE SERVICE
+21/tcp   open  ftp
+22/tcp   open  ssh
+80/tcp   open  http
+443/tcp  open  https
+3306/tcp open  mysql
+
+Nmap done: 1 IP address (1 host up) scanned in 1.85 seconds\n`;
+
+        case 'traceroute':
+        case 'tracert':
+            const traceTarget = arg || 'target.com';
+            return `traceroute to ${traceTarget} (93.184.216.34), 30 hops max, 64 byte packets
+ 1  gateway (192.168.1.1)  1.124 ms  1.002 ms  0.915 ms
+ 2  10.20.0.1 (10.20.0.1)  14.521 ms  14.102 ms
+ 3  core-router-isp.net (172.16.40.1)  28.412 ms  27.985 ms
+ 4  ${traceTarget} (93.184.216.34)  31.204 ms  30.891 ms\n`;
+
+        case 'nslookup':
+            const dnsTarget = arg || 'ejemplo.com';
+            return `Server:         192.168.1.1
+Address:        192.168.1.1#53
+
+Non-authoritative answer:
+Name:   ${dnsTarget}
+Address: 93.184.216.34
+Address: 2606:2800:220:1:248:1893:25c8:1946\n`;
+
+        case 'whoami':
+            return `root (uid=0 gid=0 euid=0)\n`;
+
+        case 'dirbuster':
+        case 'gobuster':
+            return `[+] Progress: 1200 / 4600 (26.08%)
+[+] Found: /index.html (Status: 200)
+[+] Found: /assets/ (Status: 301)
+[+] Found: /login.php (Status: 200)
+[+] Found: /admin/ (Status: 403)
+[+] Found: /robots.txt (Status: 200)\n`;
+
+        case 'hash':
+            const textToHash = arg || 'devsuite';
+            return `Texto: "${textToHash}"
+MD5    : 5d41402abc4b2a76b9719d911017c592
+SHA256 : 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\n`;
+
+        case 'base64':
+            const textB64 = arg || 'HackingEtico';
+            return `Codificado Base64: ${btoa(textB64)}\n`;
+
+        default:
+            return `bash: ${command}: comando no reconocido. Escribe 'help' para ver los comandos disponibles.\n`;
+    }
+}
