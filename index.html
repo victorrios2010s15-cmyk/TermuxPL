@@ -46,6 +46,7 @@
             <button class="nav-btn" data-target="python-section">🐍 Laboratorio Python</button>
             <button class="nav-btn" data-target="api-section">🌐 Probador API</button>
             <button class="nav-btn" data-target="css-section">🎨 Laboratorio CSS</button>
+            <button class="nav-btn" data-target="js-lab-section">⚡ Laboratorio JS</button>
             <button class="nav-btn" data-target="vault-section">🔐 Bóveda de Código</button>
             <button class="nav-btn" data-target="tutorials-section">📺 Tutoriales</button>
             <button class="nav-btn" data-target="cyber-section">🔐 Ciberseguridad</button>
@@ -181,7 +182,31 @@ print('¡Hola desde Python!')"></textarea>
                 </div>
             </section>
 
-            <!-- 7. Bóveda de Código -->
+            <!-- 7. Laboratorio JavaScript Interactivo -->
+            <section id="js-lab-section" class="tab-section">
+                <div class="editor-toolbar">
+                    <span style="font-weight: bold; color: var(--accent); font-size: 0.9rem;">⚡ sandbox.js</span>
+                    <button id="run-js-btn" class="btn-primary">Ejecutar Script</button>
+                    <button id="clear-js-btn" class="btn-secondary">Limpiar</button>
+                </div>
+
+                <div class="tool-grid" style="margin-top: 1rem;">
+                    <div class="pane">
+                        <h3>Editor JavaScript</h3>
+                        <textarea id="js-lab-input" placeholder="// Escribe tu código JS aquí...
+console.log('¡Hola desde la consola de DevSuite!');
+let suma = 5 + 10;
+console.log('El resultado es: ' + suma);"></textarea>
+                    </div>
+                    <div class="pane">
+                        <h3>Consola de Salida</h3>
+                        <pre id="js-lab-output">&gt;&gt;&gt; Los resultados de console.log aparecerán aquí...</pre>
+                        <button id="copy-js-btn" class="btn-secondary">Copiar Salida</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. Bóveda de Código -->
             <section id="vault-section" class="tab-section">
                 <div class="vault-form">
                     <input type="text" id="vault-title" placeholder="Título del Snippet (ej: Git Commit)">
@@ -191,7 +216,7 @@ print('¡Hola desde Python!')"></textarea>
                 <div id="vault-list" class="vault-list"></div>
             </section>
 
-            <!-- 8. Tutoriales YouTube -->
+            <!-- 9. Tutoriales YouTube -->
             <section id="tutorials-section" class="tab-section">
                 <div class="vault-form">
                     <h3>Tutoriales Recomendados de Programación</h3>
@@ -200,7 +225,7 @@ print('¡Hola desde Python!')"></textarea>
                 <div id="tutorials-list" class="vault-list"></div>
             </section>
 
-            <!-- 9. Ciberseguridad / Simulador de Terminal Avanzado (¡AHORA DENTRO DE MAIN!) -->
+            <!-- 10. Ciberseguridad / Simulador de Terminal Avanzado -->
             <section id="cyber-section" class="tab-section">
                 <div class="vault-form">
                     <h3>Simulador de Terminal Ética Avanzada</h3>

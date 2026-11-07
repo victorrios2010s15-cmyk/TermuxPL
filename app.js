@@ -460,30 +460,54 @@ if (importPythonBtn && importPythonFile) {
     });
 }
 
-// --- TUTORIALES PRECARGADOS ---
+// --- TUTORIALES PRECARGADOS CON CATEGORÍAS ---
 const tutorialsList = document.getElementById('tutorials-list');
 const defaultTutorials = [
-    { title: "Curso Completo de HTML & CSS desde Cero", url: "https://www.youtube.com/watch?v=example1" },
-    { title: "JavaScript Moderno y Asíncrono para Principiantes", url: "https://www.youtube.com/watch?v=example2" },
-    { title: "Cómo Crear una Progressive Web App (PWA) Paso a Paso", url: "https://www.youtube.com/watch?v=example3" },
-    { title: "Aprende Python para Desarrolladores Web", url: "https://www.youtube.com/watch?v=example4" }
+    { title: "Curso Completo de HTML:Es el mas facil de entender, y el primero recomendado de ver, con esto ya sabes la base de una pagina.", url: "https://youtu.be/MJkdaVFHrto?si=Y54b4vosC4V_NL45", category: "web" },
+    { title: "Curso completo de CSS: Con esto es lo segundo, ya aqui sabes crear una pagina web un 70%.", url: "https://youtu.be/wZniZEbPAzk?si=ddY8Zxn9Vbsmk7WZ", category: "web" },
+    { title: "Bases de JavaScript: Esto es la base del cerebro, es la introduccion", url: "https://youtu.be/wZniZEbPAzk?si=ddY8Zxn9Vbsmk7WZ", category: "web" },
+    { title: "Curso Completo de JavaScript: Aqui ya sabes crear una pagina 100% completa.", url: "https://youtu.be/QoC4RxNIs5M?si=sgKGUPx5S8YN2A_E", category: "web" },
+    { title: "Python desde Cero", url: "https://youtu.be/IimBRwHhW54?si=Kzg9hHiY-iJBQlJo", category: "python" }
 ];
 
-function renderTutorials() {
+function renderTutorials(filterCategory = 'all') {
     if (!tutorialsList) return;
     tutorialsList.innerHTML = '';
-    defaultTutorials.forEach((item) => {
+    
+    const filtered = filterCategory === 'all' 
+        ? defaultTutorials 
+        : defaultTutorials.filter(t => t.category === filterCategory);
+
+    if (filtered.length === 0) {
+        tutorialsList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No hay tutoriales en esta categoría.</p>';
+        return;
+    }
+
+    filtered.forEach((item) => {
         const card = document.createElement('div');
         card.className = 'vault-card';
         card.innerHTML = `
-            <h4 style="margin-bottom: 0.5rem; color: var(--accent);">${item.title}</h4>
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-size: 0.85rem; word-break: break-all; display: inline-block; margin-top: 0.25rem;">▶️ Ver en YouTube</a>
+            <span style="font-size: 0.65rem; background: rgba(99, 102, 241, 0.2); color: var(--accent); padding: 0.15rem 0.4rem; border-radius: 4px; text-transform: uppercase; font-weight: bold;">${item.category}</span>
+            <h4 style="margin: 0.4rem 0 0.5rem 0; color: var(--accent); font-size: 0.95rem;">${item.title}</h4>
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-size: 0.85rem; word-break: break-all; display: inline-block;">▶️ Ver en YouTube</a>
         `;
         tutorialsList.appendChild(card);
     });
 }
-renderTutorials();
 
+document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.cat-btn').forEach(b => {
+            b.classList.remove('btn-primary');
+            b.classList.add('btn-secondary');
+        });
+        e.target.classList.remove('btn-secondary');
+        e.target.classList.add('btn-primary');
+        renderTutorials(e.target.dataset.cat);
+    });
+});
+
+renderTutorials();
 // --- SIMULADOR DE TERMINAL DE CIBERSEGURIDAD AVANZADO ---
 const terminalInput = document.getElementById('terminal-input');
 const terminalOutput = document.getElementById('terminal-output');
@@ -618,5 +642,67 @@ if ('serviceWorker' in navigator) {
                 }
             });
         });
+    });
+}
+
+// --- LABORATORIO JAVASCRIPT INTERACTIVO ---
+const jsLabInput = document.getElementById('js-lab-input');
+const jsLabOutput = document.getElementById('js-lab-output');
+const runJsBtn = document.getElementById('run-js-btn');
+const clearJsBtn = document.getElementById('clear-js-btn');
+const copyJsBtn = document.getElementById('copy-js-btn');
+
+if (runJsBtn) {
+    runJsBtn.addEventListener('click', () => {
+        const code = jsLabInput.value.trim();
+        if (!code) {
+            jsLabOutput.textContent = '>>> Error: El editor de JavaScript está vacío.';
+            jsLabOutput.style.color = 'var(--danger)';
+            return;
+        }
+
+        jsLabOutput.style.color = 'var(--text-main)';
+        let logs = [];
+
+        // Interceptamos temporalmente el console.log para capturar la salida
+        const originalConsoleLog = console.log;
+        console.log = (...args) => {
+            logs.push(args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(' '));
+        };
+
+        try {
+            // Ejecutamos el código de forma segura dentro del navegador
+            const result = new Function(code)();
+            
+            // Restauramos el console.log original
+            console.log = originalConsoleLog;
+
+            if (logs.length > 0) {
+                jsLabOutput.textContent = '>>> ' + logs.join('\n>>> ');
+            } else if (result !== undefined) {
+                jsLabOutput.textContent = '>>> ' + result;
+            } else {
+                jsLabOutput.textContent = '>>> Script ejecutado con éxito (Sin salidas en consola).';
+            }
+        } catch (err) {
+            console.log = originalConsoleLog;
+            jsLabOutput.textContent = '>>> Error de Ejecución: ' + err.message;
+            jsLabOutput.style.color = 'var(--danger)';
+        }
+    });
+}
+
+if (clearJsBtn) {
+    clearJsBtn.addEventListener('click', () => {
+        jsLabInput.value = '';
+        jsLabOutput.textContent = '>>> Consola limpia.';
+        jsLabOutput.style.color = 'var(--text-muted)';
+    });
+}
+
+if (copyJsBtn) {
+    copyJsBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(jsLabOutput.textContent);
+        alert('¡Salida de JavaScript copiada al portapapeles!');
     });
 }
