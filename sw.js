@@ -1,45 +1,32 @@
-const CACHE_NAME = 'devsuite-v6';
-const ASSETS = [
-  './index.html',
-  './style.css',
-  './app.js',
-  './manifest.json'
-];
+const CACHE_NAME = 'devsuite-v2'; // Cambia la versión si haces cambios grandes
 
-// Instalación del Service Worker y almacenamiento en caché
+// Instalación: Forzar la activación inmediata
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
-  self.skipWaiting();
+    self.skipWaiting();
 });
 
-// Activación y limpieza de cachés antiguas
+// Activación: Borrar cachés viejos automáticamente
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cache) => {
+                    if (cache !== CACHE_NAME) {
+                        console.log('Borrando caché antiguo:', cache);
+                        return caches.delete(cache);
+                    }
+                })
+            );
         })
-      );
-    })
-  );
-  self.clients.claim();
+    );
+    self.clients.claim();
 });
 
-// Interceptar peticiones para que funcione offline
+// Interceptar peticiones para servir siempre la versión más reciente
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request).catch(() => {
-        // Fallback opcional si no hay red ni caché
-        return caches.match('./index.html');
-      });
-    })
-  );
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return caches.match(event.request);
+        })
+    );
 });

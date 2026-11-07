@@ -605,3 +605,18 @@ SHA256 : 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\n`;
             return `bash: ${command}: comando no reconocido. Escribe 'help' para ver los comandos disponibles.\n`;
     }
 }
+
+// --- AUTO-ACTUALIZACIÓN DE SERVICE WORKER ---
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then((registration) => {
+        registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('change', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // Hay una nueva versión disponible, recargamos la página automáticamente
+                    window.location.reload();
+                }
+            });
+        });
+    });
+}
