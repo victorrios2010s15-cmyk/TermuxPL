@@ -500,3 +500,39 @@ select:focus {
         height: 140px;
     }
 }
+
+/* --- Ajuste para las cajas del Estudio JSON --- */
+.tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: start; /* Evita que se fuercen alturas extrañas */
+}
+
+.pane {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    height: 100%;
+}
+
+.pane textarea, .pane pre {
+    width: 100%;
+    min-height: 180px;
+    max-height: 300px; /* Limita la altura máxima para que no se salga */
+    overflow-y: auto; /* Permite hacer scroll si el error o el texto es muy largo */
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* En versión móvil (celulares), se acomoda en una sola columna con espacio seguro abajo */
+@media (max-width: 768px) {
+    .tool-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tab-section {
+        padding-bottom: 2rem; /* Da un respiro al final para que ningún botón quede cortado */
+    }
+}
+
