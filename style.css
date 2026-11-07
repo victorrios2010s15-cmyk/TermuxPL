@@ -420,6 +420,54 @@ select:focus {
     align-items: center;
 }
 
+/* --- FONDO ANIMADO CORREGIDO --- */
+.bg-animated-icons {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1; /* Esto los manda completamente al fondo para que no estorben */
+    pointer-events: none;
+}
+
+.bg-animated-icons span {
+    position: absolute;
+    display: block;
+    font-family: monospace;
+    font-weight: bold;
+    color: rgba(99, 102, 241, 0.15);
+    font-size: calc(1rem + 1.5vw);
+    bottom: -100px;
+    animation: floatUp 15s linear infinite;
+    animation-delay: calc(var(--i) * -1.5s);
+    left: calc(var(--i) * 9.5%);
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-110vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Contenedor principal por encima del fondo */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
 /* ========================================================= */
 /* --- AJUSTES RESPONSIVOS PARA TELÉFONOS (MEDIA QUERIES) --- */
 /* ========================================================= */
