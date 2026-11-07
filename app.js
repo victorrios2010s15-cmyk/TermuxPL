@@ -151,33 +151,58 @@ sendApiBtn.addEventListener('click', async () => {
     }
 });
 
-// --- 5. LABORATORIO CSS ---
+// --- 5. LABORATORIO CSS AMPLIADO ---
 const cssRadius = document.getElementById('css-radius');
 const cssShadow = document.getElementById('css-shadow');
-const cssColor = document.getElementById('css-color');
+const cssRotate = document.getElementById('css-rotate');
+const cssOpacity = document.getElementById('css-opacity');
+const cssPadding = document.getElementById('css-padding');
+const cssColor1 = document.getElementById('css-color1');
+const cssColor2 = document.getElementById('css-color2');
+const cssTextColor = document.getElementById('css-text-color');
+
 const cssBoxPreview = document.getElementById('css-box-preview');
 const cssCodeOutput = document.getElementById('css-code-output');
+
 const valRadius = document.getElementById('val-radius');
 const valShadow = document.getElementById('val-shadow');
+const valRotate = document.getElementById('val-rotate');
+const valOpacity = document.getElementById('val-opacity');
+const valPadding = document.getElementById('val-padding');
 
 function updateCSSLab() {
     const r = cssRadius.value;
     const s = cssShadow.value;
-    const c = cssColor.value;
+    const rot = cssRotate.value;
+    const op = cssOpacity.value / 100;
+    const pad = cssPadding.value;
+    const c1 = cssColor1.value;
+    const c2 = cssColor2.value;
+    const tc = cssTextColor.value;
 
     valRadius.textContent = r + 'px';
     valShadow.textContent = s + 'px';
+    valRotate.textContent = rot + 'deg';
+    valOpacity.textContent = cssOpacity.value + '%';
+    valPadding.textContent = pad + 'px';
+
+    const bgGradient = `linear-gradient(135deg, ${c1}, ${c2})`;
 
     cssBoxPreview.style.borderRadius = r + 'px';
     cssBoxPreview.style.boxShadow = `0px 10px ${s}px rgba(0,0,0,0.4)`;
-    cssBoxPreview.style.backgroundColor = c;
+    cssBoxPreview.style.transform = `rotate(${rot}deg)`;
+    cssBoxPreview.style.opacity = op;
+    cssBoxPreview.style.padding = pad + 'px';
+    cssBoxPreview.style.background = bgGradient;
+    cssBoxPreview.style.color = tc;
 
-    cssCodeOutput.value = `border-radius: ${r}px;\nbox-shadow: 0px 10px ${s}px rgba(0,0,0,0.4);\nbackground-color: ${c};`;
+    cssCodeOutput.value = `border-radius: ${r}px;\nbox-shadow: 0px 10px ${s}px rgba(0,0,0,0.4);\ntransform: rotate(${rot}deg);\nopacity: ${op};\npadding: ${pad}px;\nbackground: ${bgGradient};\ncolor: ${tc};`;
 }
 
-cssRadius.addEventListener('input', updateCSSLab);
-cssShadow.addEventListener('input', updateCSSLab);
-cssColor.addEventListener('input', updateCSSLab);
+[cssRadius, cssShadow, cssRotate, cssOpacity, cssPadding, cssColor1, cssColor2, cssTextColor].forEach(el => {
+    if (el) el.addEventListener('input', updateCSSLab);
+});
+
 updateCSSLab();
 
 // --- 6. BÓVEDA DE CÓDIGO (Snippets) ---

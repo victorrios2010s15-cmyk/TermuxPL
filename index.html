@@ -2,12 +2,26 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DevSuite PWA - Tu Centro de Desarrollo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DevSuite PWA</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
+    <!-- Fondo con Iconos Animados -->
+    <div class="bg-animated-icons">
+        <span style="--i:1;">&lt;/&gt;</span>
+        <span style="--i:2;">{ }</span>
+        <span style="--i:3;">JS</span>
+        <span style="--i:4;">#</span>
+        <span style="--i:5;">⚡</span>
+        <span style="--i:6;">&lt;code&gt;</span>
+        <span style="--i:7;">( )</span>
+        <span style="--i:8;">&lt;/&gt;</span>
+        <span style="--i:9;">CSS</span>
+        <span style="--i:10;">JSON</span>
+    </div>
+
     <div class="app-container">
         <!-- Barra Superior -->
         <header class="app-header">
@@ -89,12 +103,19 @@
                 </div>
             </section>
 
-            <!-- 4. Laboratorio CSS -->
+            <!-- 4. Laboratorio CSS Ampliado -->
             <section id="css-section" class="tab-section">
                 <div class="css-controls">
-                    <label>Radio de Borde: <input type="range" id="css-radius" min="0" max="50" value="8"> <span id="val-radius">8px</span></label>
-                    <label>Sombra (Blur): <input type="range" id="css-shadow" min="0" max="50" value="15"> <span id="val-shadow">15px</span></label>
-                    <label>Color de Fondo: <input type="color" id="css-color" value="#4f46e5"></label>
+                    <label>Radio de Borde: <input type="range" id="css-radius" min="0" max="50" value="12"> <span id="val-radius">12px</span></label>
+                    <label>Sombra (Blur): <input type="range" id="css-shadow" min="0" max="50" value="20"> <span id="val-shadow">20px</span></label>
+                    <label>Rotación: <input type="range" id="css-rotate" min="-45" max="45" value="0"> <span id="val-rotate">0deg</span></label>
+                    <label>Opacidad: <input type="range" id="css-opacity" min="10" max="100" value="100"> <span id="val-opacity">100%</span></label>
+                    <label>Padding: <input type="range" id="css-padding" min="5" max="40" value="15"> <span id="val-padding">15px</span></label>
+                    <div class="color-pickers">
+                        <label>Fondo 1: <input type="color" id="css-color1" value="#6366f1"></label>
+                        <label>Fondo 2 (Degradado): <input type="color" id="css-color2" value="#4f46e5"></label>
+                        <label>Texto: <input type="color" id="css-text-color" value="#ffffff"></label>
+                    </div>
                 </div>
                 <div class="css-preview-area">
                     <div id="css-box-preview">Caja de Prueba</div>
@@ -109,9 +130,7 @@
                     <textarea id="vault-code" placeholder="Escribe tu comando o código clave..."></textarea>
                     <button id="save-vault-btn" class="btn-primary">Guardar Snippet</button>
                 </div>
-                <div id="vault-list" class="vault-list">
-                    <!-- Aquí se cargarán las notas guardadas -->
-                </div>
+                <div id="vault-list" class="vault-list"></div>
             </section>
         </main>
     </div>
