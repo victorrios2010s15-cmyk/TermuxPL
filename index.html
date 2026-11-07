@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSuite PWA - Tu Centro de Desarrollo</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Barra Superior -->
+        <header class="app-header">
+            <div class="logo-area">
+                <span class="logo-icon">📦</span>
+                <h1>DevSuite</h1>
+            </div>
+            <div class="status-area">
+                <span id="net-status" class="status-badge online">🟢 En línea</span>
+                <button id="install-btn" class="btn-secondary" style="display: none;">Instalar App</button>
+            </div>
+        </header>
+
+        <!-- Navegación por Pestañas -->
+        <nav class="app-nav">
+            <button class="nav-btn active" data-target="editor-section">💻 Editor de Código</button>
+            <button class="nav-btn" data-target="json-section">📄 Estudio JSON</button>
+            <button class="nav-btn" data-target="api-section">🌐 Probador API</button>
+            <button class="nav-btn" data-target="css-section">🎨 Laboratorio CSS</button>
+            <button class="nav-btn" data-target="vault-section">🔐 Bóveda de Código</button>
+        </nav>
+
+        <!-- Contenido de las Secciones -->
+        <main class="app-content">
+            <!-- 1. Editor de Código -->
+            <section id="editor-section" class="tab-section active">
+                <div class="editor-toolbar">
+                    <select id="file-select">
+                        <option value="index.html">index.html</option>
+                        <option value="style.css">style.css</option>
+                        <option value="app.js">app.js</option>
+                    </select>
+                    <button id="save-file-btn" class="btn-primary">Guardar en Local</button>
+                    <button id="export-zip-btn" class="btn-secondary">Exportar Proyecto</button>
+                </div>
+                <div class="editor-workspace">
+                    <textarea id="code-textarea" placeholder="// Escribe tu código aquí..."></textarea>
+                    <div class="preview-pane">
+                        <iframe id="live-preview"></iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Estudio JSON -->
+            <section id="json-section" class="tab-section">
+                <div class="tool-grid">
+                    <div class="pane">
+                        <h3>Entrada JSON</h3>
+                        <textarea id="json-input" placeholder='{"ejemplo": true}'></textarea>
+                        <div class="action-row">
+                            <button id="format-json-btn" class="btn-primary">Formatear JSON</button>
+                            <button id="minify-json-btn" class="btn-secondary">Minificar</button>
+                        </div>
+                    </div>
+                    <div class="pane">
+                        <h3>Salida / Resultado</h3>
+                        <pre id="json-output">// El resultado aparecerá aquí...</pre>
+                        <button id="copy-json-btn" class="btn-secondary">Copiar Resultado</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Probador API -->
+            <section id="api-section" class="tab-section">
+                <div class="api-controls">
+                    <select id="api-method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                    </select>
+                    <input type="text" id="api-url" placeholder="https://api.ejemplo.com/datos">
+                    <button id="send-api-btn" class="btn-primary">Enviar Petición</button>
+                </div>
+                <div class="api-results">
+                    <div class="api-meta">
+                        <span id="api-status-badge">Estado: -</span>
+                        <span id="api-time-badge">Tiempo: -</span>
+                    </div>
+                    <pre id="api-output-pre">// Respuesta del servidor...</pre>
+                </div>
+            </section>
+
+            <!-- 4. Laboratorio CSS -->
+            <section id="css-section" class="tab-section">
+                <div class="css-controls">
+                    <label>Radio de Borde: <input type="range" id="css-radius" min="0" max="50" value="8"> <span id="val-radius">8px</span></label>
+                    <label>Sombra (Blur): <input type="range" id="css-shadow" min="0" max="50" value="15"> <span id="val-shadow">15px</span></label>
+                    <label>Color de Fondo: <input type="color" id="css-color" value="#4f46e5"></label>
+                </div>
+                <div class="css-preview-area">
+                    <div id="css-box-preview">Caja de Prueba</div>
+                    <textarea id="css-code-output" readonly></textarea>
+                </div>
+            </section>
+
+            <!-- 5. Bóveda de Código -->
+            <section id="vault-section" class="tab-section">
+                <div class="vault-form">
+                    <input type="text" id="vault-title" placeholder="Título del Snippet (ej: Git Commit)">
+                    <textarea id="vault-code" placeholder="Escribe tu comando o código clave..."></textarea>
+                    <button id="save-vault-btn" class="btn-primary">Guardar Snippet</button>
+                </div>
+                <div id="vault-list" class="vault-list">
+                    <!-- Aquí se cargarán las notas guardadas -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
