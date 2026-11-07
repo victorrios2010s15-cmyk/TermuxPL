@@ -464,10 +464,11 @@ if (importPythonBtn && importPythonFile) {
 const tutorialsList = document.getElementById('tutorials-list');
 const defaultTutorials = [
     { title: "Curso Completo de HTML:Es el mas facil de entender, y el primero recomendado de ver, con esto ya sabes la base de una pagina.", url: "https://youtu.be/MJkdaVFHrto?si=Y54b4vosC4V_NL45", category: "web" },
-    { title: "Curso completo de CSS: Con esto es lo segundo, ya aqui sabes crear una pagina web un 70%.", url: "https://youtu.be/wZniZEbPAzk?si=ddY8Zxn9Vbsmk7WZ", category: "web" },
+    { title: "Curso completo de CSS: Con esto es lo segundo, ya aqui sabes crear una pagina web un 70%(Ya sabes casi todo para no decir todo).", url: "https://youtu.be/wZniZEbPAzk?si=ddY8Zxn9Vbsmk7WZ", category: "web" },
     { title: "Bases de JavaScript: Esto es la base del cerebro, es la introduccion", url: "https://youtu.be/wZniZEbPAzk?si=ddY8Zxn9Vbsmk7WZ", category: "web" },
     { title: "Curso Completo de JavaScript: Aqui ya sabes crear una pagina 100% completa.", url: "https://youtu.be/QoC4RxNIs5M?si=sgKGUPx5S8YN2A_E", category: "web" },
-    { title: "Python desde Cero", url: "https://youtu.be/IimBRwHhW54?si=Kzg9hHiY-iJBQlJo", category: "python" }
+    { title: "Apps PWA, Ya sabrias crear apps desde las paginas.", url: "https://youtu.be/M2X7K2rxm9E?si=MmI8s78Ce53B8uYr", category: "web" },
+    { title: "Python desde Cero", url: "https://youtu.be/IimBRwHhW54?si=Kzg9hHiY-iJBQlJo", category: "python" },
 ];
 
 function renderTutorials(filterCategory = 'all') {
