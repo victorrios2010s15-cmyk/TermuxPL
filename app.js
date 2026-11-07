@@ -13,25 +13,33 @@ navBtns.forEach(btn => {
     });
 });
 
-// --- 2. EDITOR DE CÓDIGO & PREVIEW ---
+// --- 2. EDITOR DE CÓDIGO, PESTAÑAS & PREVIEW ---
 const codeTextarea = document.getElementById('code-textarea');
 const livePreview = document.getElementById('live-preview');
-const fileSelect = document.getElementById('file-select');
+const fileTabBtns = document.querySelectorAll('.file-tab-btn');
 
+let currentActiveFile = 'index.html';
 const files = {
     'index.html': '<h1>¡Hola Mundo!</h1>\n<p>Edita este código y mira el resultado en tiempo real.</p>',
     'style.css': 'body { font-family: sans-serif; text-align: center; margin-top: 50px; background: #f0f0f0; }',
     'app.js': 'console.log("DevSuite Activo");'
 };
 
-fileSelect.addEventListener('change', (e) => {
-    codeTextarea.value = files[e.target.value];
+// Control de pestañas visuales de archivos
+fileTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        fileTabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        currentActiveFile = btn.dataset.file;
+        codeTextarea.value = files[currentActiveFile];
+    });
 });
 
 codeTextarea.value = files['index.html'];
 
 function updatePreview() {
-    files[fileSelect.value] = codeTextarea.value;
+    files[currentActiveFile] = codeTextarea.value;
     const htmlContent = files['index.html'];
     const cssContent = files['style.css'];
     const jsContent = files['app.js'];
@@ -56,19 +64,67 @@ updatePreview();
 
 // --- GUARDAR ARCHIVO INDIVIDUAL EN LA PC ---
 document.getElementById('save-file-btn').addEventListener('click', () => {
-    const currentFilename = fileSelect.value;
     const currentContent = codeTextarea.value;
-    
     const blob = new Blob([currentContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = currentFilename;
+    a.download = currentActiveFile;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 });
+
+// --- CARGAR ARCHIVO INDIVIDUAL (.html, .css, .js) ---
+const importSingleBtn = document.getElementById('import-single-btn');
+const importSingleFile = document.getElementById('import-single-file');
+
+if (importSingleBtn && importSingleFile) {
+    importSingleBtn.addEventListener('click', () => {
+        importSingleFile.click();
+    });
+
+    importSingleFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileName = file.name;
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const content = event.target.result;
+
+            if (fileName.endsWith('.html')) {
+                currentActiveFile = 'index.html';
+            } else if (fileName.endsWith('.css')) {
+                currentActiveFile = 'style.css';
+            } else if (fileName.endsWith('.js')) {
+                currentActiveFile = 'app.js';
+            } else {
+                alert('Formato no soportado. Selecciona un archivo .html, .css o .js');
+                return;
+            }
+
+            // Actualizar pestaña visual activa
+            fileTabBtns.forEach(btn => {
+                if (btn.dataset.file === currentActiveFile) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            files[currentActiveFile] = content;
+            codeTextarea.value = content;
+            updatePreview();
+            alert(`¡Archivo "${fileName}" cargado en el editor!`);
+        };
+
+        reader.readAsText(file);
+        importSingleFile.value = '';
+    });
+}
 
 // --- 3. ESTUDIO JSON ---
 const jsonInput = document.getElementById('json-input');
