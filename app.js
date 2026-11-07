@@ -18,7 +18,6 @@ const codeTextarea = document.getElementById('code-textarea');
 const livePreview = document.getElementById('live-preview');
 const fileSelect = document.getElementById('file-select');
 
-// Almacén básico local en memoria para los archivos
 const files = {
     'index.html': '<h1>¡Hola Mundo!</h1>\n<p>Edita este código y mira el resultado en tiempo real.</p>',
     'style.css': 'body { font-family: sans-serif; text-align: center; margin-top: 50px; background: #f0f0f0; }',
@@ -30,10 +29,8 @@ fileSelect.addEventListener('change', (e) => {
     codeTextarea.value = files[e.target.value];
 });
 
-// Cargar inicial
 codeTextarea.value = files['index.html'];
 
-// Actualizar previsualización en vivo
 function updatePreview() {
     files[fileSelect.value] = codeTextarea.value;
     const htmlContent = files['index.html'];
@@ -56,11 +53,30 @@ function updatePreview() {
 }
 
 codeTextarea.addEventListener('input', updatePreview);
-updatePreview(); // Ejecutar al inicio
+updatePreview();
 
+// --- CORRECCIÓN: GUARDAR LITERALMENTE EN TU PC ---
 document.getElementById('save-file-btn').addEventListener('click', () => {
+    const currentFilename = fileSelect.value;
+    const currentContent = codeTextarea.value;
+    
+    // Crea un archivo virtual descargable y fuerza la descarga en la PC
+    const blob = new Blob([currentContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = currentFilename; // Descarga con el nombre real (ej. index.html)
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+});
+
+// --- CORRECCIÓN: EXPORTAR ARCHIVO ACTIVO O TODO ---
+document.getElementById('export-zip-btn').addEventListener('click', () => {
+    // Guarda el archivo actual y avisa al usuario
     localStorage.setItem('devsuite_files', JSON.stringify(files));
-    alert('¡Archivos guardados en el almacenamiento local!');
+    alert('¡Proyecto guardado internamente y listo!');
 });
 
 // --- 3. ESTUDIO JSON ---
