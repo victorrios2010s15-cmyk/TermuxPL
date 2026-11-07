@@ -339,11 +339,12 @@ window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
 
-// --- GESTOR MULTIPROYECTO ---
+// --- GESTOR MULTIPROYECTO CORREGIDO ---
 const projectTitleInput = document.getElementById('project-title-input');
 const saveProjectVaultBtn = document.getElementById('save-project-vault-btn');
 const projectsList = document.getElementById('projects-list');
 
+// 1. Guardar proyecto actual con título personalizado
 if (saveProjectVaultBtn) {
     saveProjectVaultBtn.addEventListener('click', () => {
         const title = projectTitleInput.value.trim();
@@ -352,13 +353,17 @@ if (saveProjectVaultBtn) {
             return;
         }
 
-        files[fileSelect.value] = codeTextarea.value;
+        // Guardamos el estado actual del editor en el archivo activo
+        if (typeof currentActiveFile !== 'undefined' && typeof codeTextarea !== 'undefined') {
+            files[currentActiveFile] = codeTextarea.value;
+        }
+
         let allProjects = JSON.parse(localStorage.getItem('devsuite_all_projects') || '{}');
 
         allProjects[title] = {
-            'index.html': files['index.html'],
-            'style.css': files['style.css'],
-            'app.js': files['app.js']
+            'index.html': files['index.html'] || '',
+            'style.css': files['style.css'] || '',
+            'app.js': files['app.js'] || ''
         };
 
         localStorage.setItem('devsuite_all_projects', JSON.stringify(allProjects));
@@ -368,6 +373,7 @@ if (saveProjectVaultBtn) {
     });
 }
 
+// 2. Cargar la lista de proyectos guardados en pantalla
 function loadProjectsList() {
     if (!projectsList) return;
     projectsList.innerHTML = '';
@@ -391,14 +397,20 @@ function loadProjectsList() {
             </div>
         `;
 
+        // Botón Cargar Proyecto
         card.querySelector('.load-proj-btn').addEventListener('click', () => {
             files['index.html'] = savedFiles['index.html'] || files['index.html'];
             files['style.css'] = savedFiles['style.css'] || files['style.css'];
             files['app.js'] = savedFiles['app.js'] || files['app.js'];
 
-            codeTextarea.value = files[fileSelect.value];
-            updatePreview();
+            if (typeof currentActiveFile !== 'undefined' && typeof codeTextarea !== 'undefined') {
+                codeTextarea.value = files[currentActiveFile];
+                updatePreview();
+            }
 
+            // Salto automático a la pestaña del editor
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const tabSections = document.querySelectorAll('.tab-section');
             navBtns.forEach(b => b.classList.remove('active'));
             tabSections.forEach(s => s.classList.remove('active'));
             
@@ -410,6 +422,7 @@ function loadProjectsList() {
             alert(`¡Proyecto "${title}" cargado correctamente en el editor!`);
         });
 
+        // Botón Eliminar Proyecto
         card.querySelector('.delete-proj-btn').addEventListener('click', () => {
             if (confirm(`¿Seguro que deseas eliminar el proyecto "${title}"?`)) {
                 delete allProjects[title];
@@ -420,6 +433,70 @@ function loadProjectsList() {
 
         projectsList.appendChild(card);
     }
+}
+
+loadProjectsList();
+
+// 3. Respaldar / Exportar todos los proyectos a JSON
+const exportAllBtn = document.getElementById('export-all-projects-btn');
+if (exportAllBtn) {
+    exportAllBtn.addEventListener('click', () => {
+        const allProjects = localStorage.getItem('devsuite_all_projects');
+        if (!allProjects || allProjects === '{}') {
+            alert('⚠️ No hay proyectos guardados para exportar.');
+            return;
+        }
+        
+        try {
+            const blob = new Blob([allProjects], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'devsuite_mis_proyectos.json';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            alert('¡Respaldo JSON generado con éxito!');
+        } catch (err) {
+            alert('Error al exportar: ' + err.message);
+        }
+    });
+}
+
+// 4. Importar Proyectos desde un archivo JSON
+const importProjectsBtn = document.getElementById('import-projects-btn');
+const importProjectsFile = document.getElementById('import-projects-file');
+
+if (importProjectsBtn && importProjectsFile) {
+    importProjectsBtn.addEventListener('click', () => {
+        importProjectsFile.click();
+    });
+
+    importProjectsFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const importedData = JSON.parse(event.target.result);
+                let currentProjects = JSON.parse(localStorage.getItem('devsuite_all_projects') || '{}');
+                
+                currentProjects = { ...currentProjects, ...importedData };
+                
+                localStorage.setItem('devsuite_all_projects', JSON.stringify(currentProjects));
+                loadProjectsList();
+                alert('¡Proyectos importados con éxito y añadidos a tu bóveda!');
+            } catch (err) {
+                alert('Error al leer el archivo. Asegúrate de que sea un JSON válido de DevSuite.');
+            }
+        };
+        reader.readAsText(file);
+        importProjectsFile.value = '';
+    });
 }
 
 loadProjectsList();

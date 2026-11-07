@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devsuite-v10'; // Cambia la versión si haces cambios grandes
+const CACHE_NAME = 'devsuite-v11'; // Cambia la versión si haces cambios grandes
 
 // Instalación: Forzar la activación inmediata
 self.addEventListener('install', (event) => {
