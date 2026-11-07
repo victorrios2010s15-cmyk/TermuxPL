@@ -9,7 +9,7 @@ navBtns.forEach(btn => {
         
         btn.classList.add('active');
         const targetSection = document.getElementById(btn.dataset.target);
-        targetSection.classList.add('active');
+        if (targetSection) targetSection.classList.add('active');
     });
 });
 
@@ -19,7 +19,7 @@ const livePreview = document.getElementById('live-preview');
 const fileSelect = document.getElementById('file-select');
 
 const files = {
-    'index.html': '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Document</title></head><body><h1>Hola mundo</h1></body></html>\n<p>Edita este código y mira el resultado en tiempo real.</p>',
+    'index.html': '<h1>¡Hola Mundo!</h1>\n<p>Edita este código y mira el resultado en tiempo real.</p>',
     'style.css': 'body { font-family: sans-serif; text-align: center; margin-top: 50px; background: #f0f0f0; }',
     'app.js': 'console.log("DevSuite Activo");'
 };
@@ -55,28 +55,20 @@ function updatePreview() {
 codeTextarea.addEventListener('input', updatePreview);
 updatePreview();
 
-// --- CORRECCIÓN: GUARDAR LITERALMENTE EN TU PC ---
+// --- GUARDAR ARCHIVO INDIVIDUAL EN LA PC ---
 document.getElementById('save-file-btn').addEventListener('click', () => {
     const currentFilename = fileSelect.value;
     const currentContent = codeTextarea.value;
     
-    // Crea un archivo virtual descargable y fuerza la descarga en la PC
     const blob = new Blob([currentContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = currentFilename; // Descarga con el nombre real (ej. index.html)
+    a.download = currentFilename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-});
-
-// --- CORRECCIÓN: EXPORTAR ARCHIVO ACTIVO O TODO ---
-document.getElementById('export-zip-btn').addEventListener('click', () => {
-    // Guarda el archivo actual y avisa al usuario
-    localStorage.setItem('devsuite_files', JSON.stringify(files));
-    alert('¡Proyecto guardado internamente y listo!');
 });
 
 // --- 3. ESTUDIO JSON ---
@@ -214,6 +206,7 @@ const vaultList = document.getElementById('vault-list');
 let snippets = JSON.parse(localStorage.getItem('devsuite_vault')) || [];
 
 function renderVault() {
+    if (!vaultList) return;
     vaultList.innerHTML = '';
     snippets.forEach((item, index) => {
         const card = document.createElement('div');
@@ -227,14 +220,16 @@ function renderVault() {
     });
 }
 
-saveVaultBtn.addEventListener('click', () => {
-    if (!vaultTitle.value || !vaultCode.value) return alert('Completa los campos');
-    snippets.push({ title: vaultTitle.value, code: vaultCode.value });
-    localStorage.setItem('devsuite_vault', JSON.stringify(snippets));
-    vaultTitle.value = '';
-    vaultCode.value = '';
-    renderVault();
-});
+if (saveVaultBtn) {
+    saveVaultBtn.addEventListener('click', () => {
+        if (!vaultTitle.value || !vaultCode.value) return alert('Completa los campos');
+        snippets.push({ title: vaultTitle.value, code: vaultCode.value });
+        localStorage.setItem('devsuite_vault', JSON.stringify(snippets));
+        vaultTitle.value = '';
+        vaultCode.value = '';
+        renderVault();
+    });
+}
 
 window.deleteSnippet = function(index) {
     snippets.splice(index, 1);
@@ -253,31 +248,28 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Capturar evento de instalación de la PWA
 let deferredPrompt;
 const installBtn = document.getElementById('install-btn');
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installBtn.style.display = 'block';
+    if (installBtn) installBtn.style.display = 'block';
 
-    installBtn.addEventListener('click', () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-                console.log('Usuario aceptó instalar la PWA');
-            }
-            deferredPrompt = null;
+    if (installBtn) {
+        installBtn.addEventListener('click', () => {
+            installBtn.style.display = 'none';
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+            });
         });
-    });
+    }
 });
 
-// Control de estado de red (Online / Offline)
 const netStatus = document.getElementById('net-status');
-
 function updateOnlineStatus() {
+    if (!netStatus) return;
     if (navigator.onLine) {
         netStatus.textContent = '🟢 En línea';
         netStatus.style.background = 'rgba(34, 197, 94, 0.1)';
@@ -288,7 +280,331 @@ function updateOnlineStatus() {
         netStatus.style.color = 'var(--danger)';
     }
 }
-
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 updateOnlineStatus();
+
+// --- GESTOR MULTIPROYECTO (Bóveda de Proyectos con Títulos) ---
+const projectTitleInput = document.getElementById('project-title-input');
+const saveProjectVaultBtn = document.getElementById('save-project-vault-btn');
+const projectsList = document.getElementById('projects-list');
+
+
+// Guardar proyecto con título personalizado desde su sección
+if (saveProjectVaultBtn) {
+    saveProjectVaultBtn.addEventListener('click', () => {
+        const title = projectTitleInput.value.trim();
+        if (!title) {
+            alert('Por favor, escribe un título para el proyecto.');
+            return;
+        }
+
+        files[fileSelect.value] = codeTextarea.value;
+        let allProjects = JSON.parse(localStorage.getItem('devsuite_all_projects') || '{}');
+
+        allProjects[title] = {
+            'index.html': files['index.html'],
+            'style.css': files['style.css'],
+            'app.js': files['app.js']
+        };
+
+        localStorage.setItem('devsuite_all_projects', JSON.stringify(allProjects));
+        projectTitleInput.value = '';
+        loadProjectsList();
+        alert(`¡Proyecto "${title}" guardado con éxito!`);
+    });
+}
+
+// Cargar la lista de proyectos en pantalla y corregir salto automático a pestaña
+function loadProjectsList() {
+    if (!projectsList) return;
+    projectsList.innerHTML = '';
+    
+    let allProjects = JSON.parse(localStorage.getItem('devsuite_all_projects') || '{}');
+    
+    if (Object.keys(allProjects).length === 0) {
+        projectsList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No hay proyectos guardados aún.</p>';
+        return;
+    }
+
+    for (const [title, savedFiles] of Object.entries(allProjects)) {
+        const card = document.createElement('div');
+        card.className = 'vault-card';
+        card.innerHTML = `
+            <h4 style="margin-bottom: 0.5rem; color: var(--accent);">${title}</h4>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">Contiene: index, style, app</p>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn-primary load-proj-btn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;">Cargar</button>
+                <button class="btn-secondary delete-proj-btn" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; color: var(--danger);">Eliminar</button>
+            </div>
+        `;
+
+        // Botón para cargar el proyecto, actualizar editores Y saltar automáticamente a la pestaña del editor
+        card.querySelector('.load-proj-btn').addEventListener('click', () => {
+            files['index.html'] = savedFiles['index.html'] || files['index.html'];
+            files['style.css'] = savedFiles['style.css'] || files['style.css'];
+            files['app.js'] = savedFiles['app.js'] || files['app.js'];
+
+            // Refrescar el textarea con el archivo seleccionado en el selector
+            codeTextarea.value = files[fileSelect.value];
+            updatePreview();
+
+            // SALTO AUTOMÁTICO: Cambia a la pestaña de "Editor de Código" visualmente
+            navBtns.forEach(b => b.classList.remove('active'));
+            tabSections.forEach(s => s.classList.remove('active'));
+            
+            const editorBtn = document.querySelector('[data-target="editor-section"]');
+            const editorSection = document.getElementById('editor-section');
+            if (editorBtn) editorBtn.classList.add('active');
+            if (editorSection) editorSection.classList.add('active');
+
+            alert(`¡Proyecto "${title}" cargado correctamente en el editor!`);
+        });
+
+        // Botón para eliminar proyecto
+        card.querySelector('.delete-proj-btn').addEventListener('click', () => {
+            if (confirm(`¿Seguro que deseas eliminar el proyecto "${title}"?`)) {
+                delete allProjects[title];
+                localStorage.setItem('devsuite_all_projects', JSON.stringify(allProjects));
+                loadProjectsList();
+            }
+        });
+
+        projectsList.appendChild(card);
+    }
+}
+
+loadProjectsList();
+
+// --- RESPALDAR / EXPORTAR TODOS LOS PROYECTOS A JSON ---
+const exportAllBtn = document.getElementById('export-all-projects-btn');
+if (exportAllBtn) {
+    exportAllBtn.addEventListener('click', () => {
+        const allProjects = localStorage.getItem('devsuite_all_projects');
+        if (!allProjects || allProjects === '{}') {
+            alert('No hay proyectos guardados para exportar.');
+            return;
+        }
+        
+        const blob = new Blob([allProjects], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'devsuite_mis_proyectos.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+}
+
+// --- IMPORTAR PROYECTOS DESDE UN ARCHIVO JSON ---
+const importProjectsBtn = document.getElementById('import-projects-btn');
+const importProjectsFile = document.getElementById('import-projects-file');
+
+if (importProjectsBtn && importProjectsFile) {
+    importProjectsBtn.addEventListener('click', () => {
+        importProjectsFile.click();
+    });
+
+    importProjectsFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const importedData = JSON.parse(event.target.result);
+                let currentProjects = JSON.parse(localStorage.getItem('devsuite_all_projects') || '{}');
+                
+                currentProjects = { ...currentProjects, ...importedData };
+                
+                localStorage.setItem('devsuite_all_projects', JSON.stringify(currentProjects));
+                loadProjectsList();
+                alert('¡Proyectos importados con éxito y añadidos a tu bóveda!');
+            } catch (err) {
+                alert('Error al leer el archivo. Asegúrate de que sea un JSON válido de DevSuite.');
+            }
+        };
+        reader.readAsText(file);
+        importProjectsFile.value = '';
+    });
+}
+
+// --- CARGAR ARCHIVO INDIVIDUAL (.html, .css, .js) ---
+const importSingleBtn = document.getElementById('import-single-btn');
+const importSingleFile = document.getElementById('import-single-file');
+
+if (importSingleBtn && importSingleFile) {
+    importSingleBtn.addEventListener('click', () => {
+        importSingleFile.click();
+    });
+
+    importSingleFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const fileName = file.name;
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const content = event.target.result;
+
+            if (fileName.endsWith('.html')) {
+                files['index.html'] = content;
+                fileSelect.value = 'index.html';
+            } else if (fileName.endsWith('.css')) {
+                files['style.css'] = content;
+                fileSelect.value = 'style.css';
+            } else if (fileName.endsWith('.js')) {
+                files['app.js'] = content;
+                fileSelect.value = 'app.js';
+            } else {
+                alert('Formato no soportado. Selecciona un archivo .html, .css o .js');
+                return;
+            }
+
+            codeTextarea.value = content;
+            updatePreview();
+            alert(`¡Archivo "${fileName}" cargado en el editor!`);
+        };
+
+        reader.readAsText(file);
+        importSingleFile.value = '';
+    });
+}
+
+// --- LABORATORIO PYTHON COMPLETO ---
+const pythonInput = document.getElementById('python-input');
+const pythonOutput = document.getElementById('python-output');
+const runPythonBtn = document.getElementById('run-python-btn');
+const clearPythonBtn = document.getElementById('clear-python-btn');
+const copyPythonBtn = document.getElementById('copy-python-btn');
+const savePythonBtn = document.getElementById('save-python-btn');
+const importPythonBtn = document.getElementById('import-python-btn');
+const importPythonFile = document.getElementById('import-python-file');
+
+// 1. Ejecutar código Python (simulador de print)
+if (runPythonBtn) {
+    runPythonBtn.addEventListener('click', () => {
+        const code = pythonInput.value.trim();
+        if (!code) {
+            pythonOutput.textContent = '>>> Error: El editor está vacío.';
+            pythonOutput.style.color = 'var(--danger)';
+            return;
+        }
+
+        pythonOutput.style.color = 'var(--text-main)';
+        let logs = [];
+
+        try {
+            const printRegex = /print\s*\((.*?)\)/g;
+            let match;
+            
+            while ((match = printRegex.exec(code)) !== null) {
+                let evaluated = match[1].replace(/['"]/g, '');
+                logs.push(evaluated);
+            }
+
+            if (logs.length > 0) {
+                pythonOutput.textContent = '>>> ' + logs.join('\n>>> ');
+            } else {
+                pythonOutput.textContent = '>>> Código ejecutado correctamente (Sin salidas print).';
+            }
+        } catch (err) {
+            pythonOutput.textContent = '>>> Error de ejecución: ' + err.message;
+            pythonOutput.style.color = 'var(--danger)';
+        }
+    });
+}
+
+// 2. Limpiar consola y editor
+if (clearPythonBtn) {
+    clearPythonBtn.addEventListener('click', () => {
+        pythonInput.value = '';
+        pythonOutput.textContent = '>>> Consola limpia.';
+        pythonOutput.style.color = 'var(--text-muted)';
+    });
+}
+
+// 3. Copiar salida al portapapeles
+if (copyPythonBtn) {
+    copyPythonBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(pythonOutput.textContent);
+        alert('¡Salida copiada al portapapeles!');
+    });
+}
+
+// 4. Guardar archivo script.py localmente
+if (savePythonBtn) {
+    savePythonBtn.addEventListener('click', () => {
+        const content = pythonInput.value;
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'script.py';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+}
+
+// 5. Cargar archivo externo en el editor de Python
+if (importPythonBtn && importPythonFile) {
+    importPythonBtn.addEventListener('click', () => {
+        importPythonFile.click();
+    });
+
+    importPythonFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            pythonInput.value = event.target.result;
+            alert(`¡Archivo "${file.name}" cargado en el editor de Python!`);
+        };
+        reader.readAsText(file);
+        importPythonFile.value = '';
+    });
+}
+// --- TUTORIALES DE YOUTUBE (Precargados en el código + LocalStorage) ---
+const tutorialsList = document.getElementById('tutorials-list');
+
+// AQUÍ PUEDES AGREGAR TUS VIDEOS DIRECTAMENTE EN EL CÓDIGO
+// Cualquier persona que abra la app los verá automáticamente aquí:
+const defaultTutorials = [
+    { title: "Curso de HTML y CSS desde Cero", url: "https://www.youtube.com/watch?v=example1" },
+    { title: "JavaScript Moderno para Principiantes", url: "https://www.youtube.com/watch?v=example2" },
+    { title: "Crear una PWA paso a paso", url: "https://www.youtube.com/watch?v=example3" }
+];
+
+// Combinamos los del código con los que el usuario guarde extra de forma local
+function getStoredTutorials() {
+    let customTutorials = JSON.parse(localStorage.getItem('devsuite_tutorials')) || [];
+    return [...defaultTutorials, ...customTutorials];
+}
+
+function renderTutorials() {
+    if (!tutorialsList) return;
+    tutorialsList.innerHTML = '';
+    
+    const allTutorials = getStoredTutorials();
+
+    if (allTutorials.length === 0) {
+        tutorialsList.innerHTML = '<p style="color: var(--text-muted); font-size: 0.85rem;">No hay tutoriales disponibles.</p>';
+        return;
+    }
+
+    allTutorials.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'vault-card';
+        card.innerHTML = `
+            <h4 style="margin-bottom: 0.5rem; color: var(--accent);">${item.title}</h4>
+            <a href="${item.url}" target="_blank" style="color: #38bdf8; font-size: 0.85rem; word-break: break-all; display: block; margin-bottom: 0.75rem;">${item.url}</a>
+        `;
+        tutorialsList.appendChild(card);
+    });
+}
+
+renderTutorials();

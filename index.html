@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
     <!-- Fondo con Iconos Animados -->
     <div class="bg-animated-icons">
@@ -38,10 +40,13 @@
         <!-- Navegación por Pestañas -->
         <nav class="app-nav">
             <button class="nav-btn active" data-target="editor-section">💻 Editor de Código</button>
+            <button class="nav-btn" data-target="projects-vault-section">📂 Proyectos</button>
             <button class="nav-btn" data-target="json-section">📄 Estudio JSON</button>
+            <button class="nav-btn" data-target="python-section">🐍 Laboratorio Python</button>
             <button class="nav-btn" data-target="api-section">🌐 Probador API</button>
             <button class="nav-btn" data-target="css-section">🎨 Laboratorio CSS</button>
             <button class="nav-btn" data-target="vault-section">🔐 Bóveda de Código</button>
+            <button class="nav-btn" data-target="tutorials-section">📺 Tutoriales</button>
         </nav>
 
         <!-- Contenido de las Secciones -->
@@ -55,8 +60,13 @@
                         <option value="app.js">app.js</option>
                     </select>
                     <button id="save-file-btn" class="btn-primary">Guardar en Local</button>
-                    <button id="export-zip-btn" class="btn-secondary">Exportar Proyecto</button>
+                    <button id="import-single-btn" class="btn-secondary">Cargar Archivo</button>
                 </div>
+
+                <!-- Inputs ocultos para archivos -->
+                <input type="file" id="import-single-file" accept=".html,.css,.js" style="display: none;">
+                <input type="file" id="import-projects-file" accept=".json" style="display: none;">
+
                 <div class="editor-workspace">
                     <textarea id="code-textarea" placeholder="// Escribe tu código aquí..."></textarea>
                     <div class="preview-pane">
@@ -65,7 +75,25 @@
                 </div>
             </section>
 
-            <!-- 2. Estudio JSON -->
+            <!-- 2. Gestor de Proyectos Guardados (Bóveda de Proyectos) -->
+            <section id="projects-vault-section" class="tab-section">
+                <div class="vault-form">
+                    <h3>Gestor de Proyectos</h3>
+                    <input type="text" id="project-title-input" placeholder="Nombre del proyecto (ej: Mi Web Personal)">
+                    <button id="save-project-vault-btn" class="btn-primary">Guardar Proyecto Actual</button>
+                </div>
+
+                <div class="vault-actions" style="margin: 1rem 0; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button id="import-projects-btn" class="btn-secondary" style="font-size: 0.8rem;">Importar Proyectos</button>
+                    <button id="export-all-projects-btn" class="btn-secondary" style="font-size: 0.8rem;">Respaldar Todo (JSON)</button>
+                </div>
+
+                <div id="projects-list" class="vault-list">
+                    <!-- Aquí aparecerán las tarjetas de cada proyecto guardado -->
+                </div>
+            </section>
+
+            <!-- 3. Estudio JSON -->
             <section id="json-section" class="tab-section">
                 <div class="tool-grid">
                     <div class="pane">
@@ -84,7 +112,35 @@
                 </div>
             </section>
 
-            <!-- 3. Probador API -->
+            <!-- 4. Laboratorio Python -->
+            <section id="python-section" class="tab-section">
+                <div class="editor-toolbar">
+                    <span style="font-weight: bold; color: var(--accent); font-size: 0.9rem;">🐍 script.py</span>
+                    <button id="save-python-btn" class="btn-primary">Guardar en Local</button>
+                    <button id="import-python-btn" class="btn-secondary">Cargar Archivo</button>
+                </div>
+
+                <input type="file" id="import-python-file" accept=".py,.txt" style="display: none;">
+
+                <div class="tool-grid" style="margin-top: 1rem;">
+                    <div class="pane">
+                        <h3>Editor Python</h3>
+                        <textarea id="python-input" placeholder="# Escribe tu código Python aquí...
+print('¡Hola desde Python!')"></textarea>
+                        <div class="action-row">
+                            <button id="run-python-btn" class="btn-primary">Ejecutar Código</button>
+                            <button id="clear-python-btn" class="btn-secondary">Limpiar</button>
+                        </div>
+                    </div>
+                    <div class="pane">
+                        <h3>Consola / Salida</h3>
+                        <pre id="python-output">&gt;&gt;&gt; El resultado de la ejecución aparecerá aquí...</pre>
+                        <button id="copy-python-btn" class="btn-secondary">Copiar Salida</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Probador API -->
             <section id="api-section" class="tab-section">
                 <div class="api-controls">
                     <select id="api-method">
@@ -103,7 +159,7 @@
                 </div>
             </section>
 
-            <!-- 4. Laboratorio CSS Ampliado -->
+            <!-- 6. Laboratorio CSS Ampliado -->
             <section id="css-section" class="tab-section">
                 <div class="css-controls">
                     <label>Radio de Borde: <input type="range" id="css-radius" min="0" max="50" value="12"> <span id="val-radius">12px</span></label>
@@ -123,7 +179,7 @@
                 </div>
             </section>
 
-            <!-- 5. Bóveda de Código -->
+            <!-- 7. Bóveda de Código -->
             <section id="vault-section" class="tab-section">
                 <div class="vault-form">
                     <input type="text" id="vault-title" placeholder="Título del Snippet (ej: Git Commit)">
@@ -132,9 +188,19 @@
                 </div>
                 <div id="vault-list" class="vault-list"></div>
             </section>
+
+            <!-- 8. Tutoriales YouTube -->
+            <section id="tutorials-section" class="tab-section">
+                <div class="vault-form">
+                    <h3>Tutoriales Recomendados de Programación</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Colección oficial de cursos y recursos guardados.</p>
+                </div>
+                <div id="tutorials-list" class="vault-list"></div>
+            </section>
         </main>
     </div>
 
     <script src="app.js"></script>
 </body>
+
 </html>
